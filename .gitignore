@@ -1,0 +1,16 @@
+# Maven
+.m2/
+target/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+
+# Env
+.env
+
+# Temp
+tmp/

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.agro.contracts";
+option java_outer_classname = "EcommerceProto";
+
+service InventoryService {
+  rpc ReserveStock(ReserveStockRequest) returns (CommandReply);
+  rpc ReleaseStock(ReleaseStockRequest) returns (CommandReply);
+}
+
+service AccountService {
+  rpc DebitBuyer(DebitBuyerRequest) returns (CommandReply);
+  rpc CreditSeller(CreditSellerRequest) returns (CommandReply);
+  rpc RefundBuyer(RefundBuyerRequest) returns (CommandReply);
+  rpc ReverseSellerCredit(ReverseSellerCreditRequest) returns (CommandReply);
+}
+
+service PaymentService {
+  rpc AuthorizePayment(AuthorizePaymentRequest) returns (CommandReply);
+  rpc CapturePayment(CapturePaymentRequest) returns (CommandReply);
+  rpc RefundPayment(RefundPaymentRequest) returns (CommandReply);
+}
+
+message ReserveStockRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string productId = 3;
+  int32 quantity = 4;
+}
+
+message ReleaseStockRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string productId = 3;
+  int32 quantity = 4;
+}
+
+message DebitBuyerRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string buyerId = 3;
+  double amount = 4;
+}
+
+message CreditSellerRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string sellerId = 3;
+  double amount = 4;
+}
+
+message RefundBuyerRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string buyerId = 3;
+  double amount = 4;
+}
+
+message ReverseSellerCreditRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string sellerId = 3;
+  double amount = 4;
+}
+
+message CommandReply {
+  bool success = 1;
+  string message = 2;
+}
+
+message AuthorizePaymentRequest {
+  string commandId = 1;
+  string orderId = 2;
+  string buyerId = 3;
+  string paymentMethodId = 4;
+  double amount = 5;
+  string currency = 6;
+}
+
+message CapturePaymentRequest {
+  string commandId = 1;
+  string orderId = 2;
+  double amount = 3;
+  string currency = 4;
+}
+
+message RefundPaymentRequest {
+  string commandId = 1;
+  string orderId = 2;
+  double amount = 3;
+  string currency = 4;
+}

@@ -1,0 +1,20 @@
+server:
+  port: 8086
+
+cart:
+  base-url: http://localhost:8085
+
+catalog:
+  base-url: http://localhost:8083
+
+pricing:
+  base-url: http://localhost:8084
+
+user:
+  base-url: http://localhost:8088
+
+shipping:
+  base-url: http://localhost:8089
+
+order:
+  base-url: http://localhost:8080
