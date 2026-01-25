@@ -9,10 +9,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     defer-datasource-initialization: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -25,22 +28,20 @@ spring:
 grpc:
   client:
     inventory:
-      address: static://localhost:9091
+      address: static://${INVENTORY_GRPC_ADDRESS}
       negotiationType: plaintext
     payment:
-      address: static://localhost:9093
+      address: static://${PAYMENT_GRPC_ADDRESS}
       negotiationType: plaintext
 
 shipping:
-  base-url: http://localhost:8089
+  base-url: ${SHIPPING_BASE_URL}
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info
   endpoint:
-    prometheus:
-      enabled: true
     health:
       probes:
         enabled: true

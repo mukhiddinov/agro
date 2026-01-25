@@ -9,6 +9,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     defer-datasource-initialization: true
   sql:
@@ -16,18 +19,16 @@ spring:
       mode: never
 
 catalog:
-  base-url: http://localhost:8083
+  base-url: ${CATALOG_BASE_URL}
 
 pricing:
-  base-url: http://localhost:8084
+  base-url: ${PRICING_BASE_URL}
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info
   endpoint:
-    prometheus:
-      enabled: true
     health:
       probes:
         enabled: true

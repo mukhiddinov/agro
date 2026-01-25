@@ -15,9 +15,30 @@ service:
   port: 8080
 
 env:
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
-  SPRING_DATASOURCE_USERNAME: agro
-  SPRING_DATASOURCE_PASSWORD: agro123
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    value: kafka.kafka.svc.cluster.local:9092
+  - name: CART_BASE_URL
+    value: http://cart-service:8085
+  - name: CATALOG_BASE_URL
+    value: http://catalog-service:8083
+  - name: PRICING_BASE_URL
+    value: http://pricing-service:8084
+  - name: USER_BASE_URL
+    value: http://user-service:8088
+  - name: SHIPPING_BASE_URL
+    value: http://shipping-service:8089
+  - name: ORDER_BASE_URL
+    value: http://order-service:8080
+  - name: INVENTORY_GRPC_ADDRESS
+    value: inventory-service:9091
+  - name: PAYMENT_GRPC_ADDRESS
+    value: payment-service:9093
 
 
 resources:

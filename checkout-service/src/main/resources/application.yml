@@ -2,30 +2,39 @@ server:
   port: 8086
 
 cart:
-  base-url: http://localhost:8085
+  base-url: ${CART_BASE_URL}
 
 catalog:
-  base-url: http://localhost:8083
+  base-url: ${CATALOG_BASE_URL}
 
 pricing:
-  base-url: http://localhost:8084
+  base-url: ${PRICING_BASE_URL}
 
 user:
-  base-url: http://localhost:8088
+  base-url: ${USER_BASE_URL}
 
 shipping:
-  base-url: http://localhost:8089
+  base-url: ${SHIPPING_BASE_URL}
 
 order:
-  base-url: http://localhost:8080
+  base-url: ${ORDER_BASE_URL}
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info
   endpoint:
-    prometheus:
-      enabled: true
     health:
       probes:
         enabled: true
