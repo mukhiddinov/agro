@@ -1,30 +1,15 @@
-replicaCount: 2
-
-image:
-  repository: docker.io/mukhiddinov/agro-catalog-service
-  tag: "latest"
-  pullPolicy: Always
-
-containerPort: 8083
-
-service:
-  type: ClusterIP
-  port: 8083
-
-env:
-  - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/catalogdb
-  - name: SPRING_DATASOURCE_USERNAME
-    value: agro
-  - name: SPRING_DATASOURCE_PASSWORD
-    value: agro123
-  - name: KAFKA_BOOTSTRAP_SERVERS
-    value: kafka.kafka.svc.cluster.local:9092
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 256Mi
-  limits:
-    cpu: 500m
-    memory: 512Mi
+project: default
+source:
+  repoURL: https://github.com/mukhiddinov/agro.git
+  targetRevision: main
+  path: helm/agro
+  helm:
+    valueFiles:
+      - values/catalog.yaml
+destination:
+  server: https://kubernetes.default.svc
+  namespace: agro
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
