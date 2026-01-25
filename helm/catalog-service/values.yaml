@@ -1,11 +1,11 @@
-replicaCount: 2
+replicaCount: 1
 
 nameOverride: ""
 fullnameOverride: ""
 
 image:
   repository: docker.io/mukhiddinov/agro-catalog-service
-  tag: "latest"
+  tag: latest
   pullPolicy: Always
 
 containerPort: 8083
@@ -14,16 +14,16 @@ service:
   type: ClusterIP
   port: 8083
 
-env: [
+env:
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/catalogdb
   - name: SPRING_DATASOURCE_USERNAME
     value: agro
   - name: SPRING_DATASOURCE_PASSWORD
     value: agro123
+
   - name: KAFKA_BOOTSTRAP_SERVERS
     value: redpanda.kafka.svc.cluster.local:9093
-]
 
 resources:
   requests:
