@@ -2,27 +2,27 @@ server:
   port: 8086
 
 cart:
-  base-url: ${CART_BASE_URL}
+  base-url: ${CART_BASE_URL:http://cart-service:8085}
 
 catalog:
-  base-url: ${CATALOG_BASE_URL}
+  base-url: ${CATALOG_BASE_URL:http://catalog-service:8083}
 
 pricing:
-  base-url: ${PRICING_BASE_URL}
+  base-url: ${PRICING_BASE_URL:http://pricing-service:8084}
 
 user:
-  base-url: ${USER_BASE_URL}
+  base-url: ${USER_BASE_URL:http://user-service:8088}
 
 shipping:
-  base-url: ${SHIPPING_BASE_URL}
+  base-url: ${SHIPPING_BASE_URL:http://shipping-service:8089}
 
 order:
-  base-url: ${ORDER_BASE_URL}
+  base-url: ${ORDER_BASE_URL:http://order-service:8080}
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres.db.svc.cluster.local:5432/checkoutdb}
+    username: ${SPRING_DATASOURCE_USERNAME:agro}
+    password: ${SPRING_DATASOURCE_PASSWORD:agro123}
   jpa:
     hibernate:
       ddl-auto: update

@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres.db.svc.cluster.local:5432/orderdb}
+    username: ${SPRING_DATASOURCE_USERNAME:agro}
+    password: ${SPRING_DATASOURCE_PASSWORD:agro123}
   jpa:
     hibernate:
       ddl-auto: update
@@ -28,14 +28,14 @@ spring:
 grpc:
   client:
     inventory:
-      address: static://${INVENTORY_GRPC_ADDRESS}
+      address: static://${INVENTORY_GRPC_ADDRESS:inventory-service:9091}
       negotiationType: plaintext
     payment:
-      address: static://${PAYMENT_GRPC_ADDRESS}
+      address: static://${PAYMENT_GRPC_ADDRESS:payment-service:9093}
       negotiationType: plaintext
 
 shipping:
-  base-url: ${SHIPPING_BASE_URL}
+  base-url: ${SHIPPING_BASE_URL:http://shipping-service:8089}
 management:
   endpoints:
     web:

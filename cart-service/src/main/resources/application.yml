@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres.db.svc.cluster.local:5432/cartdb}
+    username: ${SPRING_DATASOURCE_USERNAME:agro}
+    password: ${SPRING_DATASOURCE_PASSWORD:agro123}
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,10 +19,10 @@ spring:
       mode: never
 
 catalog:
-  base-url: ${CATALOG_BASE_URL}
+  base-url: ${CATALOG_BASE_URL:http://catalog-service:8083}
 
 pricing:
-  base-url: ${PRICING_BASE_URL}
+  base-url: ${PRICING_BASE_URL:http://pricing-service:8084}
 management:
   endpoints:
     web:
