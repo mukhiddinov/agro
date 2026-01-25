@@ -20,3 +20,12 @@ catalog:
 
 pricing:
   base-url: http://localhost:8084
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true

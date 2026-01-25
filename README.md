@@ -22,10 +22,24 @@ Use Docker Compose to run PostgreSQL and Kafka (Postgres exposed on `5433`):
 docker compose up -d
 ```
 
-## Build
+## Local build
+
+Build all modules:
 
 ```bash
 mvn clean install
+```
+
+Build a single service:
+
+```bash
+mvn -pl order-service -am package
+```
+
+Build a Docker image (multi-stage, JDK 17):
+
+```bash
+docker build --build-arg SERVICE_NAME=order-service -t ghcr.io/your-org/agro-order-service:LOCAL .
 ```
 
 ## Run
@@ -73,3 +87,30 @@ curl http://localhost:8080/orders/{orderId}
 - gRPC ports: inventory `9091`, payment `9093`, account `9094`.
 - Kafka broker: `localhost:9092`.
 - For a real deployment, add migrations, observability, and retries with backoff.
+
+## Kubernetes with Helm
+
+Install or upgrade a service (example for order-service):
+
+```bash
+helm upgrade --install order-service helm/agro-service \\
+  --set image.repository=ghcr.io/your-org/agro-order-service \\
+  --set image.tag=REPLACE_WITH_GIT_SHA \\
+  --set containerPort=8080 \\
+  --set service.port=80
+```
+
+## Prometheus metrics
+
+Each service exposes:
+
+```
+/actuator/health
+/actuator/prometheus
+```
+
+The Helm deployment includes Prometheus scrape annotations for `/actuator/prometheus` on the application port.
+
+## ArgoCD deployment
+
+This repo is designed to be consumed by ArgoCD as a Helm source. Point an ArgoCD Application at this repo and chart path `helm/agro-service`, then override `image.repository`, `image.tag`, `containerPort`, and environment variables per service.
