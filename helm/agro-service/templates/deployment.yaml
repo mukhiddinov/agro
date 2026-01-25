@@ -29,10 +29,9 @@ spec:
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
           env:
-            {{- if .Values.env }}
-            {{- toYaml .Values.env | nindent 12 }}
-            {{- else }}
-            []
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
             {{- end }}
           livenessProbe:
             httpGet:

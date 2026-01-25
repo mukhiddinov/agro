@@ -16,7 +16,7 @@ This repo contains a minimal, production-oriented microservice backend implement
 - `contracts`: shared protobuf definitions.
 
 ## Local dependencies
-Use Docker Compose to run PostgreSQL and Kafka (Postgres exposed on `5433`):
+Use Docker Compose to run PostgreSQL and Kafka (Postgres exposed on `5432`):
 
 ```bash
 docker compose up -d

@@ -18,7 +18,6 @@ env:
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
   SPRING_DATASOURCE_USERNAME: agro
   SPRING_DATASOURCE_PASSWORD: agro123
-  SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
 
 
 resources:

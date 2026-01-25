@@ -7,9 +7,9 @@ grpc:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/inventorydb
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
