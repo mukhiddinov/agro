@@ -106,6 +106,7 @@ Each service exposes:
 
 ```
 /actuator/health
+/actuator/info
 /actuator/prometheus
 ```
 
