@@ -1,0 +1,40 @@
+replicaCount: 2
+
+image:
+  repository: docker.io/mukhiddinov/agro-checkout-service
+  tag: "latest"
+  pullPolicy: Always
+
+containerPort: 8086
+
+service:
+  type: ClusterIP
+  port: 8086
+
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/checkoutdb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+  - name: CART_BASE_URL
+    value: http://cart-service.default.svc.cluster.local:8085
+  - name: CATALOG_BASE_URL
+    value: http://catalog-service.default.svc.cluster.local:8083
+  - name: PRICING_BASE_URL
+    value: http://pricing-service.default.svc.cluster.local:8084
+  - name: USER_BASE_URL
+    value: http://user-service.default.svc.cluster.local:8088
+  - name: SHIPPING_BASE_URL
+    value: http://shipping-service.default.svc.cluster.local:8089
+  - name: ORDER_BASE_URL
+    value: http://order-service.default.svc.cluster.local:8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

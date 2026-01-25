@@ -1,0 +1,32 @@
+replicaCount: 2
+
+image:
+  repository: docker.io/mukhiddinov/agro-cart-service
+  tag: "latest"
+  pullPolicy: Always
+
+containerPort: 8085
+
+service:
+  type: ClusterIP
+  port: 8085
+
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/cartdb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+  - name: CATALOG_BASE_URL
+    value: http://catalog-service.default.svc.cluster.local:8083
+  - name: PRICING_BASE_URL
+    value: http://pricing-service.default.svc.cluster.local:8084
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

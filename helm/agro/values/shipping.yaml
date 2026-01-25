@@ -1,0 +1,28 @@
+replicaCount: 2
+
+image:
+  repository: docker.io/mukhiddinov/agro-shipping-service
+  tag: "latest"
+  pullPolicy: Always
+
+containerPort: 8089
+
+service:
+  type: ClusterIP
+  port: 8089
+
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/shippingdb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

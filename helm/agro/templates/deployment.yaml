@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "agro-service.fullname" . }}
+  name: {{ include "agro.fullname" . }}
   labels:
-    {{- include "agro-service.labels" . | nindent 4 }}
+    {{- include "agro.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "agro-service.name" . }}
+      app.kubernetes.io/name: {{ include "agro.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "agro-service.name" . }}
+        app.kubernetes.io/name: {{ include "agro.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
       annotations:
         prometheus.io/scrape: "true"
@@ -21,7 +21,7 @@ spec:
         prometheus.io/port: "{{ .Values.containerPort }}"
     spec:
       containers:
-        - name: {{ include "agro-service.name" . }}
+        - name: {{ include "agro.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -32,16 +32,16 @@ spec:
             {{- toYaml .Values.env | nindent 12 }}
           readinessProbe:
             httpGet:
-              path: /actuator/health/readiness
-              port: 8080
+              path: /actuator/health
+              port: {{ .Values.containerPort }}
             initialDelaySeconds: 70
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 6
           livenessProbe:
             httpGet:
-              path: /actuator/health/liveness
-              port: 8080
+              path: /actuator/health
+              port: {{ .Values.containerPort }}
             initialDelaySeconds: 90
             periodSeconds: 15
             timeoutSeconds: 5
