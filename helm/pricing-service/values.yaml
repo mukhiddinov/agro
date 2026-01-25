@@ -1,0 +1,25 @@
+replicaCount: 2
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker.io/mukhiddinov/agro-pricing-service
+  tag: "latest"
+  pullPolicy: Always
+
+containerPort: 8084
+
+service:
+  type: ClusterIP
+  port: 8084
+
+env: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

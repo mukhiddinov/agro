@@ -1,0 +1,25 @@
+replicaCount: 2
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker.io/mukhiddinov/agro-catalog-service
+  tag: "latest"
+  pullPolicy: Always
+
+containerPort: 8083
+
+service:
+  type: ClusterIP
+  port: 8083
+
+env: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
