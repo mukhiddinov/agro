@@ -6,10 +6,13 @@
   <parent>
     <groupId>com.agro</groupId>
     <artifactId>agro-platform</artifactId>
+
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>pricing-service</artifactId>
+
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -49,7 +52,15 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+</plugin>
     </plugins>
   </build>
 </project>
