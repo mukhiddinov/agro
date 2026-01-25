@@ -1,11 +1,8 @@
-replicaCount: 2
-
-nameOverride: ""
-fullnameOverride: ""
+replicaCount: 1
 
 image:
   repository: docker.io/mukhiddinov/agro-order-service
-  tag: "latest"
+  tag: latest
   pullPolicy: Always
 
 containerPort: 8080
@@ -14,12 +11,12 @@ service:
   type: ClusterIP
   port: 8080
 
-env: []
-
-resources:
-  requests:
-    cpu: 100m
-    memory: 256Mi
-  limits:
-    cpu: 500m
-    memory: 512Mi
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    value: kafka.kafka.svc.cluster.local:9092
