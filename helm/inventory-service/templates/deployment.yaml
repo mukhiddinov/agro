@@ -33,7 +33,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8080
+              port: {{ .Values.containerPort }}
             initialDelaySeconds: 70
             periodSeconds: 10
             timeoutSeconds: 5
@@ -41,7 +41,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8080
+              port: {{ .Values.containerPort }}
             initialDelaySeconds: 90
             periodSeconds: 15
             timeoutSeconds: 5

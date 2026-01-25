@@ -21,7 +21,6 @@ env:
     value: agro
   - name: SPRING_DATASOURCE_PASSWORD
     value: agro123
-
   - name: KAFKA_BOOTSTRAP_SERVERS
     value: redpanda.kafka.svc.cluster.local:9093
 

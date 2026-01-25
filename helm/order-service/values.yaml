@@ -1,5 +1,8 @@
 replicaCount: 1
 
+nameOverride: ""
+fullnameOverride: ""
+
 image:
   repository: docker.io/mukhiddinov/agro-order-service
   tag: latest
@@ -21,3 +24,10 @@ env:
   - name: KAFKA_BOOTSTRAP_SERVERS
     value: redpanda.kafka.svc.cluster.local:9093
 
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
