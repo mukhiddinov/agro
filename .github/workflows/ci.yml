@@ -56,47 +56,43 @@ jobs:
 
           docker push ${IMAGE_REPO}:${IMAGE_TAG}
 
+  update-manifests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-update-manifests:
-  needs: build
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Install yq
+        uses: mikefarah/yq@v4.44.3
 
-    - name: Install yq
-      uses: mikefarah/yq@v4.44.3
+      - name: Update all Helm values (per-service)
+        env:
+          TAG: ${{ github.sha }}
+          DOCKER_REGISTRY: docker.io
+          DOCKER_ORG: qudrat111
+        run: |
+          set -euo pipefail
 
-    - name: Update all Helm values (per-service)
-      env:
-        TAG: ${{ github.sha }}
-        DOCKER_REGISTRY: docker.io
-        DOCKER_ORG: mukhiddinov
-      run: |
-        set -euo pipefail
+          for dir in docker/helm/*; do
+            [ -d "$dir" ] || continue
+            values="$dir/values.yaml"
+            [ -f "$values" ] || continue
 
-        for dir in docker/helm/*; do
-          [ -d "$dir" ] || continue
-          values="$dir/values.yaml"
-          [ -f "$values" ] || continue
+            svc="$(basename "$dir")"
+            image_repo="${DOCKER_REGISTRY}/${DOCKER_ORG}/${svc}"
 
-          svc="$(basename "$dir")"
-          # Image name decision:
-          # Option A: image per service == directory name
-          image_repo="${DOCKER_REGISTRY}/${DOCKER_ORG}/${svc}"
+            echo "Updating $values -> $image_repo:$TAG"
 
-          echo "Updating $values -> $image_repo:$TAG"
+            yq -i ".image.repository = \"${image_repo}\"" "$values" || true
+            yq -i ".image.registry = \"${image_repo}\"" "$values" || true
+            yq -i ".image.tag = \"${TAG}\"" "$values" || true
+          done
 
-          # Update both common keys to be safe (some charts use registry, some repository)
-          yq -i ".image.repository = \"${image_repo}\"" "$values" || true
-          yq -i ".image.registry = \"${image_repo}\"" "$values" || true
-          yq -i ".image.tag = \"${TAG}\"" "$values" || true
-        done
-
-    - name: Commit & push
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@users.noreply.github.com"
-        git add docker/helm/**/values.yaml
-        git commit -m "chore(gitops): deploy ${GITHUB_SHA}" || echo "No changes to commit"
-        git push
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add docker/helm/**/values.yaml
+          git commit -m "chore(gitops): deploy ${GITHUB_SHA}" || echo "No changes to commit"
+          git push
