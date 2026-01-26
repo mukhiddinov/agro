@@ -5,7 +5,7 @@ fullnameOverride: ""
 
 image:
   repository: docker.io/mukhiddinov/agro-order-service
-  tag: latest
+  tag: "latest"
   pullPolicy: Always
 
 containerPort: 8080
