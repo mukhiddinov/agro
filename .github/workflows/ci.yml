@@ -70,7 +70,7 @@ jobs:
         env:
           TAG: ${{ github.sha }}
           DOCKER_REGISTRY: docker.io
-          DOCKER_ORG: qudrat111
+          DOCKER_ORG: mukhiddinov
         run: |
           set -euo pipefail
 
