@@ -3,7 +3,7 @@ nameOverride: ""
 fullnameOverride: ""
 image:
   repository: docker.io/mukhiddinov/shipping-service
-  tag: "0af3b1048dbb6c948df4a2fdb9286efc54635481"
+  tag: "e3b20f70cd22fc96ee3997db1492f536bbad0315"
   pullPolicy: Always
   registry: docker.io/mukhiddinov/shipping-service
 containerPort: 8089
