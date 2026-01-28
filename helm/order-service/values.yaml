@@ -4,7 +4,6 @@ fullnameOverride: ""
 image:
   registry: docker.io/mukhiddinov/agro-order-service
   tag: "f13c702d305163a7730ec2a1b827325fe4bdf2f5"
-  repository: docker.io/mukhiddinov/order-service
 containerPort: 8080
 service:
   type: ClusterIP
