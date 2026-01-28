@@ -3,7 +3,7 @@ nameOverride: ""
 fullnameOverride: ""
 image:
   repository: docker.io/mukhiddinov/checkout-service
-  tag: "253476c836bf84302f0df87a66e877a8ecbdaa8b"
+  tag: "acd638620423e147a418c2de19341b9af719f9b7"
   pullPolicy: Always
   registry: docker.io/mukhiddinov/checkout-service
 containerPort: 8080
