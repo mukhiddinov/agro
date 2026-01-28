@@ -3,7 +3,7 @@ nameOverride: ""
 fullnameOverride: ""
 image:
   registry: docker.io/mukhiddinov/agro-order-service
-  tag: "253476c836bf84302f0df87a66e877a8ecbdaa8b"
+  tag: "latest"
 containerPort: 8080
 service:
   type: ClusterIP
