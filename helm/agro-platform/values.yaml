@@ -1,0 +1,46 @@
+# Global defaults applied to all services unless overridden per-service
+global:
+  replicaCount: 2
+  image:
+    repository: ghcr.io/example/agro
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  containerPort: 8080
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+  env: []
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /actuator/prometheus
+    prometheus.io/port: "8080"
+
+services:
+  order-service:
+    image:
+      repository: ghcr.io/example/order-service
+      tag: "1.4.2"
+    containerPort: 8081
+    service:
+      port: 8081
+    replicaCount: 3
+    env:
+      - name: SPRING_PROFILES_ACTIVE
+        value: "prod"
+
+  catalog-service:
+    image:
+      repository: ghcr.io/example/catalog-service
+      tag: "2.0.1"
+    containerPort: 8082
+    service:
+      port: 8082
+
+  cart-service:
+    image:
+      repository: ghcr.io/example/cart-service
+      tag: "1.2.0"
+    containerPort: 8083
+    service:
+      port: 8083

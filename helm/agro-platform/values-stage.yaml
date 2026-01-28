@@ -1,0 +1,12 @@
+global:
+  replicaCount: 1
+  image:
+    tag: "1.0.0-stage"
+
+services:
+  order-service:
+    replicaCount: 1
+  catalog-service:
+    replicaCount: 1
+  cart-service:
+    replicaCount: 1

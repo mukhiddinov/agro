@@ -1,0 +1,63 @@
+{{- range $name, $svc := .Values.services }}
+{{- $ctx := dict "root" $ "name" $name "svc" $svc }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agro-platform.fullname" $ctx }}
+  labels:
+    {{- include "agro-platform.labels" $ctx | nindent 4 }}
+spec:
+  replicas: {{ default $.Values.global.replicaCount $svc.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "agro-platform.name" $ctx }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "agro-platform.name" $ctx }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+      {{- $globalAnn := default dict $.Values.global.podAnnotations }}
+      {{- $svcAnn := default dict $svc.podAnnotations }}
+      {{- $ann := merge (deepCopy $globalAnn) (deepCopy $svcAnn) }}
+      {{- if $ann }}
+      annotations:
+        {{- toYaml $ann | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: {{ include "agro-platform.name" $ctx }}
+          image: "{{ default $.Values.global.image.repository $svc.image.repository }}:{{ default $.Values.global.image.tag $svc.image.tag }}"
+          imagePullPolicy: {{ default $.Values.global.image.pullPolicy $svc.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ default $.Values.global.containerPort $svc.containerPort }}
+              protocol: TCP
+          {{- $env := concat (default list $.Values.global.env) (default list $svc.env) }}
+          {{- if $env }}
+          env:
+            {{- toYaml $env | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ default $.Values.global.containerPort $svc.containerPort }}
+            initialDelaySeconds: 70
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ default $.Values.global.containerPort $svc.containerPort }}
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+          {{- $res := default $.Values.global.resources $svc.resources }}
+          {{- if $res }}
+          resources:
+            {{- toYaml $res | nindent 12 }}
+          {{- end }}
+{{- end }}

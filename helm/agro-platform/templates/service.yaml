@@ -1,0 +1,20 @@
+{{- range $name, $svc := .Values.services }}
+{{- $ctx := dict "root" $ "name" $name "svc" $svc }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "agro-platform.fullname" $ctx }}
+  labels:
+    {{- include "agro-platform.labels" $ctx | nindent 4 }}
+spec:
+  type: {{ default $.Values.global.service.type $svc.service.type }}
+  ports:
+    - name: http
+      port: {{ default $.Values.global.service.port $svc.service.port }}
+      targetPort: {{ default $.Values.global.containerPort $svc.containerPort }}
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: {{ include "agro-platform.name" $ctx }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+{{- end }}
