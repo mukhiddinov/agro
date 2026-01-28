@@ -5,7 +5,7 @@ image:
   repository: docker.io/mukhiddinov/account-service
   tag: "51b76464de3ab6613a623bbb43d986a5f0aba485"
   pullPolicy: Always
-  registry: docker.io/mukhiddinov/account-service
+  registry: docker.io/mukhiddinov/agro-account-service
 containerPort: 8080
 service:
   type: ClusterIP
