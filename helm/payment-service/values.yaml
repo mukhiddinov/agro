@@ -1,19 +1,15 @@
 replicaCount: 1
-
 nameOverride: ""
 fullnameOverride: ""
-
 image:
-  repository: docker.io/mukhiddinov/agro-payment-service
-  tag: "latest"
+  repository: docker.io/mukhiddinov/payment-service
+  tag: "51b76464de3ab6613a623bbb43d986a5f0aba485"
   pullPolicy: Always
-
+  registry: docker.io/mukhiddinov/payment-service
 containerPort: 8080
-
 service:
   type: ClusterIP
   port: 8080
-
 env:
   - name: SPRING_DATASOURCE_URL
     value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
@@ -23,7 +19,6 @@ env:
     value: agro123
   - name: KAFKA_BOOTSTRAP_SERVERS
     value: redpanda.kafka.svc.cluster.local:9093
-
 resources:
   requests:
     cpu: 100m
