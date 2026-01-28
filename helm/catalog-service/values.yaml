@@ -5,7 +5,7 @@ image:
   repository: docker.io/mukhiddinov/catalog-service
   tag: "51b76464de3ab6613a623bbb43d986a5f0aba485"
   pullPolicy: Always
-  registry: docker.io/mukhiddinov/catalog-service
+  registry: docker.io/mukhiddinov/agro-catalog-service
 containerPort: 8083
 service:
   type: ClusterIP
