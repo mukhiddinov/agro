@@ -84,8 +84,6 @@ jobs:
 
             echo "Updating $values -> $image_repo:$TAG"
 
-            yq -i ".image.repository = \"${image_repo}\"" "$values" || true
-            yq -i ".image.registry = \"${image_repo}\"" "$values" || true
             yq -i ".image.tag = \"${TAG}\"" "$values" || true
           done
 
