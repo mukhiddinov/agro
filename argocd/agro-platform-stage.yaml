@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: agro-platform-stage
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: |
+      account=mukhiddinov/agro-account-service
+      cart=mukhiddinov/agro-cart-service
+      catalog=mukhiddinov/agro-catalog-service
+      checkout=mukhiddinov/agro-checkout-service
+      inventory=mukhiddinov/agro-inventory-service
+      order=mukhiddinov/agro-order-service
+      payment=mukhiddinov/agro-payment-service
+      pricing=mukhiddinov/agro-pricing-service
+      shipping=mukhiddinov/agro-shipping-service
+      user=mukhiddinov/agro-user-service
+    argocd-image-updater.argoproj.io/update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/force-update: "true"
+    argocd-image-updater.argoproj.io/account.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/cart.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/catalog.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/checkout.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/inventory.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/order.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/payment.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/pricing.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/shipping.allow-tags: regexp:^latest$
+    argocd-image-updater.argoproj.io/user.allow-tags: regexp:^latest$
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/mukhiddinov/agro.git
+    targetRevision: main
+    path: helm/agro-platform
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-stage.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: agro-stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

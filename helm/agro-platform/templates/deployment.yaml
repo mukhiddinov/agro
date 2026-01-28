@@ -1,5 +1,10 @@
 {{- range $name, $svc := .Values.services }}
 {{- $ctx := dict "root" $ "name" $name "svc" $svc }}
+{{- $tag := default $.Values.global.image.tag $svc.image.tag }}
+{{- $pullPolicy := default $.Values.global.image.pullPolicy $svc.image.pullPolicy }}
+{{- if and (eq $tag "latest") (not $svc.image.pullPolicy) (not $.Values.global.image.pullPolicy) }}
+{{- $pullPolicy = "Always" }}
+{{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,8 +33,8 @@ spec:
     spec:
       containers:
         - name: {{ include "agro-platform.name" $ctx }}
-          image: "{{ default $.Values.global.image.repository $svc.image.repository }}:{{ default $.Values.global.image.tag $svc.image.tag }}"
-          imagePullPolicy: {{ default $.Values.global.image.pullPolicy $svc.image.pullPolicy }}
+          image: "{{ $.Values.global.image.repositoryPrefix }}-{{ $name }}:{{ $tag }}"
+          imagePullPolicy: {{ $pullPolicy }}
           ports:
             - name: http
               containerPort: {{ default $.Values.global.containerPort $svc.containerPort }}

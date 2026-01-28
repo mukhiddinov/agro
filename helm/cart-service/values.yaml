@@ -1,0 +1,28 @@
+replicaCount: 1
+nameOverride: ""
+fullnameOverride: ""
+image:
+  repository: docker.io/mukhiddinov/cart-service
+  tag: "acd638620423e147a418c2de19341b9af719f9b7"
+  pullPolicy: Always
+  registry: docker.io/mukhiddinov/cart-service
+containerPort: 8085
+service:
+  type: ClusterIP
+  port: 8085
+env:
+  - name: SPRING_DATASOURCE_URL
+    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
+  - name: SPRING_DATASOURCE_USERNAME
+    value: agro
+  - name: SPRING_DATASOURCE_PASSWORD
+    value: agro123
+  - name: KAFKA_BOOTSTRAP_SERVERS
+    value: redpanda.kafka.svc.cluster.local:9093
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

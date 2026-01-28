@@ -1,12 +1,2 @@
 global:
   replicaCount: 3
-  image:
-    tag: "1.0.0"
-
-services:
-  order-service:
-    replicaCount: 4
-  catalog-service:
-    replicaCount: 3
-  cart-service:
-    replicaCount: 3
