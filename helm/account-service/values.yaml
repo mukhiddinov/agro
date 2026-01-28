@@ -1,7 +1,7 @@
 replicaCount: 1
 nameOverride: ""fullnameOverride: ""
 image:
-  registry: docker.io/mukhiddinov/account-service
+  registry: docker.io/mukhiddinov/agro-account-service
   tag: "e3b20f70cd22fc96ee3997db1492f536bbad0315"
   repository: docker.io/mukhiddinov/account-service
 containerPort: 8080
