@@ -105,6 +105,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add deploy/charts/agri-platform/values-prod.yaml
+          git add helm/agro-platform/values.yaml
           git commit -m "chore(gitops): deploy ${GITHUB_SHA}" || echo "No changes to commit"
           git push
