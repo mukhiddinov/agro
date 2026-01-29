@@ -72,7 +72,7 @@ jobs:
           docker push ${IMAGE_REPO}:${SHORT_SHA}
 
   update-manifests:
-    needs: build
+    needs: build-images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
