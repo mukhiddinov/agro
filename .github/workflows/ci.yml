@@ -70,3 +70,37 @@ jobs:
           IMAGE_REPO=${IMAGE_NAMESPACE}/agro-${{ matrix.service }}
           docker push ${IMAGE_REPO}:latest
           docker push ${IMAGE_REPO}:${SHORT_SHA}
+
+  update-manifests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        uses: mikefarah/yq@v4.44.3
+
+      - name: Update all Helm values (per-service)
+        env:
+          TAG: ${{ github.sha }}
+          DOCKER_REGISTRY: docker.io
+          DOCKER_ORG: mukhiddinov
+        run: |
+          set -euo pipefail
+
+          for dir in helm/agro-platform*; do
+            [ -d "$dir" ] || continue
+            values="$dir/values.yaml"
+            [ -f "$values" ] || continue
+
+            svc="$(basename "$dir")"
+            image_repo="${DOCKER_REGISTRY}/${DOCKER_ORG}/${svc}"
+
+            echo "Updating $values -> $image_repo:$TAG"
+
+            yq -i ".image.tag = \"${TAG}\"" "$values" || true
+          done
+            -t ${IMAGE_REPO}:latest \
+            -t ${IMAGE_REPO}:${SHORT_SHA} \
+            .
