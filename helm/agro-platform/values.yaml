@@ -25,7 +25,7 @@ services:
   order-service:
     env:
       - name: SPRING_PROFILES_ACTIVE
-        value: "prod"
+        value: "stage"
   payment-service: {}
   pricing-service: {}
   shipping-service: {}
