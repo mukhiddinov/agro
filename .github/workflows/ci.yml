@@ -100,7 +100,4 @@ jobs:
             echo "Updating $values -> $image_repo:$TAG"
 
             yq -i ".image.tag = \"${TAG}\"" "$values" || true
-          done
-            -t ${IMAGE_REPO}:latest \
-            -t ${IMAGE_REPO}:${SHORT_SHA} \
             .
