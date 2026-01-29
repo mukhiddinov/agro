@@ -17,16 +17,9 @@ global:
     prometheus.io/port: "8080"
 
 services:
-  account-service: {}
-  cart-service: {}
   catalog-service: {}
-  checkout-service: {}
-  inventory-service: {}
   order-service:
     env:
       - name: SPRING_PROFILES_ACTIVE
         value: "stage"
-  payment-service: {}
-  pricing-service: {}
-  shipping-service: {}
   user-service: {}

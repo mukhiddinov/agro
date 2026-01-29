@@ -10,7 +10,7 @@ service:
   port: 8083
 env:
   - name: SPRING_DATASOURCE_URL
-    value: jdbc:postgresql://postgres.db.svc.cluster.local:5432/agrodb
+    value: jdbc:postgresql://postgres:5432/agrodb
   - name: SPRING_DATASOURCE_USERNAME
     value: agro
   - name: SPRING_DATASOURCE_PASSWORD

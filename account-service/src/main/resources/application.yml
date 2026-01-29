@@ -7,7 +7,7 @@ grpc:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres.db.svc.cluster.local:5432/accountdb}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/accountdb}
     username: ${SPRING_DATASOURCE_USERNAME:agro}
     password: ${SPRING_DATASOURCE_PASSWORD:agro123}
   jpa:
