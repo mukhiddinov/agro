@@ -3,7 +3,7 @@ global:
   replicaCount: 2
   image:
     repositoryPrefix: mukhiddinov/agro
-    tag: latest
+    tag: c209f52
     pullPolicy: Always
   containerPort: 8080
   service:
@@ -15,7 +15,6 @@ global:
     prometheus.io/scrape: "true"
     prometheus.io/path: /actuator/prometheus
     prometheus.io/port: "8080"
-
 services:
   catalog-service: {}
   order-service:
