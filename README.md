@@ -1,117 +1,252 @@
-# AgroPlatform - Minimal E-commerce Backend
+# Agro Platform — Microservices + GitOps
 
-This repo contains a minimal, production-oriented microservice backend implementing an orchestrated Saga with gRPC commands and Kafka events.
+## Overview
+Agro Platform is a Java/Spring microservices system deployed to Kubernetes via a **single umbrella Helm chart** and **GitOps with Argo CD**. Container images are built in CI and pushed to **Docker Hub** under `mukhiddinov`, using `latest` for runtime and an immutable short SHA for traceability.
 
-## Services
-- `user-service`: user profile and address management (REST).
-- `catalog-service`: product catalog, categories, variants (REST).
-- `pricing-service`: pricing quotes (REST).
-- `cart-service`: cart lifecycle and pricing snapshots (REST).
-- `checkout-service`: validates cart and creates orders (REST).
-- `order-service`: saga orchestrator, order creation/status (REST), gRPC clients, Kafka saga events.
-- `inventory-service`: stock reservation/release (gRPC server), Kafka inventory events.
-- `payment-service`: authorize/capture/refund (gRPC server), REST health endpoint, Kafka payment events.
-- `account-service`: buyer debit / seller credit (gRPC server), Kafka account events.
-- `shipping-service`: shipping options + shipment creation (REST).
-- `contracts`: shared protobuf definitions.
+**Key components**
+- Microservices: account, cart, catalog, checkout, inventory, order, payment, pricing, shipping, user
+- Deployment: Helm umbrella chart at `helm/agro-platform`
+- GitOps: Argo CD Applications in `argocd/`
+- Observability: Prometheus + Grafana + Loki (Helm values in `monitoring/`)
+- Kubernetes: DigitalOcean DOKS
 
-## Local dependencies
-Use Docker Compose to run PostgreSQL and Kafka (Postgres exposed on `5432`):
+## Repository layout
+- `helm/agro-platform/`: umbrella chart used by Argo CD
+- `argocd/`: Argo CD Application manifests
+- `monitoring/`: Helm values for Prometheus, Grafana, Loki
+- `Dockerfile`: multi-stage build, supports `--build-arg SERVICE_NAME=<service>`
+- `docker-compose.yml`: local PostgreSQL + Kafka
 
+Note: legacy per-service Helm charts still exist under `helm/*` (e.g., `helm/cart-service`) but are **not used**. Only `helm/agro-platform` is supported.
+
+## Prerequisites
+- `kubectl`
+- `helm`
+- `docker`
+- `doctl` (DigitalOcean CLI)
+- `argocd` CLI (optional)
+
+## Local development (optional)
+Start PostgreSQL and Kafka:
 ```bash
 docker compose up -d
 ```
 
-## Local build
-
-Build all modules:
-
+Build all services:
 ```bash
 mvn clean install
 ```
 
 Build a single service:
-
 ```bash
 mvn -pl order-service -am package
 ```
 
-Build a Docker image (multi-stage, JDK 17):
-
+Build a local image:
 ```bash
-docker build --build-arg SERVICE_NAME=order-service -t ghcr.io/your-org/agro-order-service:LOCAL .
+docker build --build-arg SERVICE_NAME=order-service -t mukhiddinov/agro-order-service:local .
 ```
 
-## Run
-Start each service in its own terminal:
-
+Run a service locally:
 ```bash
-mvn -pl user-service spring-boot:run
-mvn -pl catalog-service spring-boot:run
-mvn -pl pricing-service spring-boot:run
-mvn -pl cart-service spring-boot:run
-mvn -pl checkout-service spring-boot:run
 mvn -pl order-service spring-boot:run
-mvn -pl inventory-service spring-boot:run
-mvn -pl payment-service spring-boot:run
-mvn -pl account-service spring-boot:run
-mvn -pl shipping-service spring-boot:run
 ```
 
-## Swagger UI
-Swagger UI is available on each service at:
+## CI/CD pipeline (GitHub Actions)
+Workflow: `.github/workflows/ci.yml`
 
-```
-http://localhost:{port}/swagger-ui.html
-```
+**What it does**
+- Matrix build for all services
+- Builds Docker images using `--build-arg SERVICE_NAME=<service>`
+- Tags and pushes to Docker Hub only on `main`
+- Tags: `latest` and `<short-sha>`
+- No Helm values changes per-commit (GitOps is handled by Argo CD + Image Updater)
 
-## Checkout to order (happy path)
+**Image naming**
+- `mukhiddinov/agro-<service>:latest`
+- `mukhiddinov/agro-<service>:<short-sha>`
 
+## Deployment to DigitalOcean DOKS
+### 1) Configure kubeconfig
 ```bash
-curl -X POST http://localhost:8086/checkout \
-  -H 'Content-Type: application/json' \
-  -d '{"cartId":"CART-1","userId":"U-1","addressId":"ADDR-1","currency":"USD","shippingOptionId":"STANDARD","paymentMethodId":"PM-OK"}'
+doctl kubernetes cluster kubeconfig save <cluster-name>
 ```
 
-## Order status
-
+### 2) Create namespace
 ```bash
-curl http://localhost:8080/orders/{orderId}
+kubectl create namespace agro
 ```
 
-## Notes
-- Databases are auto-created in PostgreSQL by `docker/initdb/01-create-dbs.sql`.
-- REST ports:
-  - order `8080`, catalog `8083`, pricing `8084`, cart `8085`, checkout `8086`,
-    payment `8087`, user `8088`, shipping `8089`.
-- gRPC ports: inventory `9091`, payment `9093`, account `9094`.
-- Kafka broker: `localhost:9092`.
-- For a real deployment, add migrations, observability, and retries with backoff.
-
-## Kubernetes with Helm
-
-Install or upgrade a service (example for order-service):
-
+### 3) Install Argo CD
 ```bash
-helm upgrade --install order-service helm/agro-service \\
-  --set image.repository=ghcr.io/your-org/agro-order-service \\
-  --set image.tag=REPLACE_WITH_GIT_SHA \\
-  --set containerPort=8080 \\
-  --set service.port=80
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 
-## Prometheus metrics
+### 4) Create Argo CD Applications
+This repo includes:
+- `argocd/agro-platform-stage.yaml`
+- `argocd/agro-platform-prod.yaml`
 
-Each service exposes:
-
+Apply them:
+```bash
+kubectl apply -n argocd -f argocd/agro-platform-stage.yaml
+kubectl apply -n argocd -f argocd/agro-platform-prod.yaml
 ```
-/actuator/health
-/actuator/info
-/actuator/prometheus
+
+**Note:** these manifests currently target `agro-stage` and `agro-prod` namespaces. If you want a single namespace (`agro`) update the `spec.destination.namespace` fields accordingly.
+
+### 5) Enable auto-sync
+Auto-sync (prune + self-heal) is already set in `argocd/agro-platform-stage.yaml`.
+
+## Helm chart configuration
+Umbrella chart path: `helm/agro-platform`
+
+**Defaults**
+- `global.image.repositoryPrefix`: `mukhiddinov/agro`
+- `global.image.tag`: `latest`
+- `global.image.pullPolicy`: `Always`
+
+**Image resolution**
+```
+{{ .Values.global.image.repositoryPrefix }}-{{ serviceName }}:{{ tag }}
 ```
 
-The Helm deployment includes Prometheus scrape annotations for `/actuator/prometheus` on the application port.
+Per-service overrides are allowed but optional.
 
-## ArgoCD deployment
+## Datastores and required env vars
+### PostgreSQL
+Default DB names (per service):
 
-This repo is designed to be consumed by ArgoCD as a Helm source. Point an ArgoCD Application at this repo and chart path `helm/agro-service`, then override `image.repository`, `image.tag`, `containerPort`, and environment variables per service.
+| Service | Database |
+|---|---|
+| account-service | accountdb |
+| cart-service | cartdb |
+| catalog-service | catalogdb |
+| checkout-service | checkoutdb |
+| inventory-service | inventorydb |
+| order-service | orderdb |
+| payment-service | paymentdb |
+| pricing-service | pricingdb |
+| shipping-service | shippingdb |
+| user-service | userdb |
+
+Recommended service endpoint (DOKS):
+- `postgresql.agro.svc.cluster.local:5432`
+
+### Kafka
+Recommended service endpoint (DOKS):
+- `kafka.agro.svc.cluster.local:9092`
+
+### Required environment variables
+Set these via Helm `services.<name>.env` or global `env`:
+
+| Variable | Example | Notes |
+|---|---|---|
+| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://postgresql.agro.svc.cluster.local:5432/orderdb` | Overrides per-service defaults in `application.yml` |
+| `SPRING_DATASOURCE_USERNAME` | `agro` | Defaults to `agro` |
+| `SPRING_DATASOURCE_PASSWORD` | `agro123` | Defaults to `agro123` |
+| `KAFKA_BOOTSTRAP_SERVERS` | `kafka.agro.svc.cluster.local:9092` | Required by Kafka-enabled services (account, catalog, inventory, order, payment); safe to set globally |
+
+## Observability (Prometheus + Grafana + Loki)
+Helm values are provided in `monitoring/`.
+
+### Install Prometheus
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install prometheus prometheus-community/prometheus \
+  --namespace monitoring --create-namespace \
+  -f monitoring/prometheus-values.yaml
+```
+
+### Install Loki + Promtail
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm upgrade --install loki grafana/loki-stack \
+  --namespace monitoring \
+  -f monitoring/loki-stack-values.yaml
+```
+
+### Install Grafana
+```bash
+helm upgrade --install grafana grafana/grafana \
+  --namespace monitoring \
+  -f monitoring/grafana-values.yaml
+```
+
+### Grafana data sources
+`monitoring/grafana-values.yaml` already provisions Prometheus and Loki data sources.
+
+### Example queries
+**PromQL**
+- JVM memory usage:
+  ```
+  jvm_memory_used_bytes
+  ```
+- HTTP request rate (if available):
+  ```
+  rate(http_server_requests_seconds_count[5m])
+  ```
+
+**LogQL**
+- Order-service logs by pod name (adjust labels to match your cluster):
+  ```
+  {namespace="agro", pod=~".*order-service.*"}
+  ```
+- Filter by error keyword:
+  ```
+  {namespace="agro"} |= "ERROR"
+  ```
+
+## Argo CD Image Updater (latest strategy)
+Argo CD Applications are annotated to track Docker Hub images and force updates on `latest`. The Image Updater writes back to Git to preserve GitOps history.
+
+Ensure Argo CD Image Updater is installed in your cluster. Example upstream installation:
+```bash
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
+```
+
+## Troubleshooting
+**CrashLoopBackOff (missing Kafka)**
+- Symptom: pods restart immediately
+- Fix: set `KAFKA_BOOTSTRAP_SERVERS` to `kafka.agro.svc.cluster.local:9092`
+
+**DB DNS errors**
+- Symptom: `UnknownHostException` or connection refused to Postgres
+- Fix: ensure PostgreSQL service exists in `agro` namespace and update `SPRING_DATASOURCE_URL`
+
+**ArgoCD OutOfSync vs Synced**
+- OutOfSync: live state differs from Git; ArgoCD will sync on refresh (auto or manual)
+- Synced: live state matches Git
+- Use `argocd app get <app>` and `argocd app sync <app>` to refresh/sync
+
+**ImagePullBackOff**
+- Symptom: pods stuck pulling `latest`
+- Fix: verify Docker Hub repo exists and image tags are pushed (`latest`, `<short-sha>`)
+
+## Screenshot placeholders
+### ArgoCD Application details - Synced/Healthy
+[SCREENSHOT_PLACEHOLDER: ArgoCD Application details - Synced/Healthy]
+- Open Argo CD UI → Applications → select `agro-platform-stage`
+- Capture the summary card showing Sync: Synced, Health: Healthy
+
+### ArgoCD Tree view of agro namespace
+[SCREENSHOT_PLACEHOLDER: ArgoCD Tree view of agro namespace]
+- Open Argo CD UI → Application → Tree view
+- Expand Deployments/Services and capture the full tree
+
+### Grafana dashboard - service metrics
+[SCREENSHOT_PLACEHOLDER: Grafana dashboard - service metrics]
+- Open Grafana → Dashboards → select a service dashboard
+- Capture panels showing request rate or JVM metrics
+
+### Loki logs query for order-service
+[SCREENSHOT_PLACEHOLDER: Loki logs query for order-service]
+- Open Grafana → Explore → Loki
+- Run LogQL query for order-service logs and capture results
+
+## Required repo edits for accuracy
+- `argocd/agro-platform-stage.yaml`: change `spec.destination.namespace` to `agro` if you want a single namespace
+- `argocd/agro-platform-prod.yaml`: change `spec.destination.namespace` to `agro` if you want a single namespace
