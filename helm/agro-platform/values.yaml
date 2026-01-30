@@ -10,7 +10,13 @@ global:
     type: ClusterIP
     port: 80
   resources: {}
-  env: []
+  env:
+    - name: SPRING_DATASOURCE_URL
+      value: "jdbc:postgresql://postgresql.agro.svc.cluster.local:5432/agrodb"
+    - name: SPRING_DATASOURCE_USERNAME
+      value: "postgres"
+    - name: SPRING_DATASOURCE_PASSWORD
+      value: "postgres"
   podAnnotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: /actuator/prometheus
