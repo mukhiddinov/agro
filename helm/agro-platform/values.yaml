@@ -3,7 +3,7 @@ global:
   replicaCount: 2
   image:
     repositoryPrefix: mukhiddinov/agro
-    tag: "1a97a22"
+    tag: "1b5ba8f"
     pullPolicy: Always
   containerPort: 8080
   service:
