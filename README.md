@@ -226,26 +226,40 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argoc
 - Symptom: pods stuck pulling `latest`
 - Fix: verify Docker Hub repo exists and image tags are pushed (`latest`, `<short-sha>`)
 
-## Screenshot placeholders
-### ArgoCD Application details - Synced/Healthy
-[SCREENSHOT_PLACEHOLDER: ArgoCD Application details - Synced/Healthy]
-- Open Argo CD UI → Applications → select `agro-platform-stage`
-- Capture the summary card showing Sync: Synced, Health: Healthy
 
-### ArgoCD Tree view of agro namespace
-[SCREENSHOT_PLACEHOLDER: ArgoCD Tree view of agro namespace]
-- Open Argo CD UI → Application → Tree view
-- Expand Deployments/Services and capture the full tree
+### Argo CD Application details — Synced / Healthy
+![ArgoCD Application details](screenshot/app_details.jpg)
 
-### Grafana dashboard - service metrics
-[SCREENSHOT_PLACEHOLDER: Grafana dashboard - service metrics]
-- Open Grafana → Dashboards → select a service dashboard
-- Capture panels showing request rate or JVM metrics
+- Argo CD UI → Applications → `agro-platform-stage`
+- Application status: **Sync = Synced**, **Health = Healthy**
+- All microservices are reconciled from Git via GitOps
 
-### Loki logs query for order-service
-[SCREENSHOT_PLACEHOLDER: Loki logs query for order-service]
-- Open Grafana → Explore → Loki
-- Run LogQL query for order-service logs and capture results
+---
+
+### Argo CD Tree view of `agro` namespace
+![ArgoCD Tree view](screenshot/tree_view_argocd.jpg)
+
+- Argo CD → Application → **Tree**
+- Shows Deployments, Services, ReplicaSets, and Pods
+- Confirms correct ownership and reconciliation by the umbrella Helm chart
+
+---
+
+### Grafana dashboard — Service metrics
+![Grafana Dashboard](screenshot/grafana_dashboard.jpg)
+
+- Grafana → Dashboards
+- Prometheus metrics scraped from Spring Boot Actuator
+- JVM memory, pod-level metrics, and application health indicators
+
+---
+
+### Loki logs — order-service
+![Loki Logs](screenshot/loki_dashboard.jpg)
+
+- Grafana → Explore → Loki
+- LogQL query filtered by namespace and service
+- Centralized log aggregation via Promtail + Loki
 
 ## Required repo edits for accuracy
 - `argocd/agro-platform-stage.yaml`: change `spec.destination.namespace` to `agro` if you want a single namespace
