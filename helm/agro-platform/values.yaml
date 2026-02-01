@@ -3,7 +3,7 @@ global:
   replicaCount: 2
   image:
     repositoryPrefix: mukhiddinov/agro
-    tag: "637dd3a"
+    tag: "1a97a22"
     pullPolicy: Always
   containerPort: 8080
   service:
@@ -30,7 +30,6 @@ services:
       port: 8083
     podAnnotations:
       prometheus.io/port: "8083"
-
   order-service:
     containerPort: 8080
     service:
@@ -38,7 +37,6 @@ services:
     env:
       - name: SPRING_PROFILES_ACTIVE
         value: "stage"
-
   user-service:
     containerPort: 8088
     service:
