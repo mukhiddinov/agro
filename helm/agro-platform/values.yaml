@@ -24,9 +24,22 @@ global:
     prometheus.io/path: /actuator/prometheus
     prometheus.io/port: "8080"
 services:
-  catalog-service: {}
+  catalog-service:
+    containerPort: 8083
+    service:
+      port: 8083
+    podAnnotations:
+      prometheus.io/port: "8083"
+
   order-service:
+    containerPort: 8080
+    service:
+      port: 8080
     env:
       - name: SPRING_PROFILES_ACTIVE
         value: "stage"
-  user-service: {}
+
+  user-service:
+    containerPort: 8088
+    service:
+      port: 8088
